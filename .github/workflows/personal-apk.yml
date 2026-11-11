@@ -42,9 +42,13 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          # Pinned to the version the repo declares, so a Flutter release
-          # can't quietly change what you're building.
-          flutter-version-file: .flutter-version
+          # Pinned explicitly, the same way upstream's all-release.yml does.
+          # flutter-version-file expects a pubspec.yaml, not the bare version
+          # in .flutter-version, so it was silently ignored and every run got
+          # whatever "stable" was that day - which by November 2026 required
+          # Gradle 9.3 and broke the build. Keep this in step with
+          # .flutter-version when rebasing onto a newer upstream.
+          flutter-version: 3.47.0
           channel: stable
           cache: true
 
@@ -89,9 +93,12 @@ jobs:
       # message instead of 200 lines of Gradle output. Not fatal: upstream
       # already carries some info-level lint noise, and a warning shouldn't
       # cost you the APK.
+      # lib/ only: the vendored packages under packages/ ship example apps
+      # whose own dependencies are never fetched, so analysing the whole repo
+      # reports dozens of errors in code that is not part of the app.
       - name: flutter analyze
         continue-on-error: true
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib
 
       - name: Build APK
         run: |
