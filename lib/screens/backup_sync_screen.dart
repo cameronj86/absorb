@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../providers/library_provider.dart';
 import '../services/backup_service.dart';
+import '../services/player_settings.dart';
 import '../services/settings_sync_service.dart';
 import '../widgets/overlay_toast.dart';
 import 'sync_connection_screen.dart';
@@ -319,6 +320,9 @@ class _BackupSyncScreenState extends State<BackupSyncScreen> {
       if (confirmed != true || !mounted) return;
 
       await BackupService.importSettings(data);
+      // Fork addition: apply the restored trust-all flag now, not at the
+      // next launch (see the same fix in login_screen.dart).
+      applyTrustAllCerts(await PlayerSettings.getTrustAllCerts());
 
       // Apply theme immediately
       final settings = data['settings'] as Map<String, dynamic>?;

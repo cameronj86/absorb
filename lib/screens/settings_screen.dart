@@ -156,7 +156,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _feedSwipeLeft = 'dismiss';
   int _inboxWindowDays = 21;
   bool _queueListLayout = true;
-  String _nowPlayingLayout = 'dial';
+  String _forkPlayerLayout = 'dial';
   bool _queueAutoDownload = false;
   bool _mergeAbsorbingLibraries = false;
   bool _podcastTabEnabled = false;
@@ -1187,7 +1187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final feedSwipeLeft = await PlayerSettings.getFeedSwipeLeft();
     final inboxWindowDays = await PlayerSettings.getInboxWindowDays();
     final queueListLayout = await PlayerSettings.getQueueListLayout();
-    final nowPlayingLayout = await PlayerSettings.getNowPlayingLayout();
+    final forkPlayerLayout = await PlayerSettings.getForkPlayerLayout();
     final mp3IndexSeek = await PlayerSettings.getMp3IndexSeeking();
     final coverSize = await PlayerSettings.getCoverSize();
     final cardButtonFill = await PlayerSettings.getCardButtonFill();
@@ -1323,7 +1323,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _feedSwipeLeft = feedSwipeLeft;
       _inboxWindowDays = inboxWindowDays;
       _queueListLayout = queueListLayout;
-      _nowPlayingLayout = nowPlayingLayout;
+      _forkPlayerLayout = forkPlayerLayout;
       _queueAutoDownload = queueAutoDl;
       _mergeAbsorbingLibraries = mergeLibs;
       _maxConcurrentDownloads = maxConc;
@@ -3017,11 +3017,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ButtonSegment(value: 'tape', label: Text('Tape')),
                                 ButtonSegment(value: 'cover', label: Text('Cover')),
                               ],
-                              selected: {_nowPlayingLayout},
+                              selected: {_forkPlayerLayout},
                               onSelectionChanged: _loaded ? (s) async {
                                 if (s.isEmpty) return;
-                                setState(() => _nowPlayingLayout = s.first);
-                                await PlayerSettings.setNowPlayingLayout(s.first);
+                                setState(() => _forkPlayerLayout = s.first);
+                                await PlayerSettings.setForkPlayerLayout(s.first);
                               } : null,
                               style: const ButtonStyle(visualDensity: VisualDensity.compact),
                             )),

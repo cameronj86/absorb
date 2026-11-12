@@ -257,6 +257,17 @@ class _LoginScreenState extends State<LoginScreen>
         _serverValid = ok;
         _serverError = ok ? null : AppLocalizations.of(context)!.loginCouldNotReachServer;
         _serverErrorDetail = ok ? null : result.detail;
+        // Fork addition: the TLS error tells you to turn on "Trust all
+        // certificates above", but that switch sits inside the collapsed
+        // Advanced section. Open it so the switch is actually on screen.
+        final detail = (result.detail ?? '').toLowerCase();
+        if (!ok &&
+            !_trustAllCerts &&
+            (detail.contains('handshake') ||
+                detail.contains('certificate') ||
+                detail.contains('tls'))) {
+          _showAdvanced = true;
+        }
         if (ok) {
           _lastValidatedServer = fullUrl;
         } else {
@@ -1243,6 +1254,13 @@ class _LoginScreenState extends State<LoginScreen>
       if (confirm != true) return;
 
       await BackupService.importSettings(data);
+      // Fork addition: importSettings only writes the trust-all pref; the
+      // flag the TLS callback reads was loaded at startup and stayed stale
+      // until the next launch. Apply it now so the auto-login below can reach
+      // a server with a self-signed certificate.
+      final restoredTrust = await PlayerSettings.getTrustAllCerts();
+      applyTrustAllCerts(restoredTrust);
+      if (mounted) setState(() => _trustAllCerts = restoredTrust);
 
       // Auto-login with the first restored account
       if (hasAccounts && mounted) {

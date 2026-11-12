@@ -98,8 +98,8 @@ class _NowPlayingSheetState extends State<NowPlayingSheet> {
       _closeIfIdle();
       if (_scrub == null) setState(() {});
     });
-    PlayerSettings.getNowPlayingLayout().then((v) {
-      if (mounted && PlayerSettings.nowPlayingLayouts.contains(v)) {
+    PlayerSettings.getForkPlayerLayout().then((v) {
+      if (mounted && PlayerSettings.forkPlayerLayouts.contains(v)) {
         setState(() => _layout = v);
       }
     });
@@ -176,10 +176,10 @@ class _NowPlayingSheetState extends State<NowPlayingSheet> {
   // ── Actions ──
 
   void _cycleLayout() {
-    const all = PlayerSettings.nowPlayingLayouts;
+    const all = PlayerSettings.forkPlayerLayouts;
     final next = all[(all.indexOf(_layout) + 1) % all.length];
     setState(() => _layout = next);
-    PlayerSettings.setNowPlayingLayout(next);
+    PlayerSettings.setForkPlayerLayout(next);
     HapticFeedback.selectionClick();
   }
 
@@ -253,7 +253,7 @@ class _NowPlayingSheetState extends State<NowPlayingSheet> {
         if (value.startsWith('layout:')) {
           final next = value.substring(7);
           setState(() => _layout = next);
-          PlayerSettings.setNowPlayingLayout(next);
+          PlayerSettings.setForkPlayerLayout(next);
         }
     }
   }

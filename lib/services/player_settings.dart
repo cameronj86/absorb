@@ -542,11 +542,23 @@ class PlayerSettings {
       _set('queueListLayout', value, notify: true);
 
   /// Which full-player layout to show: 'dial', 'tape' or 'cover'.
-  static const List<String> nowPlayingLayouts = ['dial', 'tape', 'cover'];
-  static Future<String> getNowPlayingLayout() =>
-      _get('nowPlayingLayout', 'dial');
-  static Future<void> setNowPlayingLayout(String value) =>
-      _set('nowPlayingLayout', value, notify: true);
+  /// Named "forkPlayer..." because upstream 1.12 took "nowPlayingLayout" for
+  /// its notification text layout; sharing the key would clobber each other.
+  static const List<String> forkPlayerLayouts = ['dial', 'tape', 'cover'];
+  static Future<String> getForkPlayerLayout() async {
+    // One-time move off the old key. Builds before the 1.12 rebase stored
+    // 'dial' / 'tape' / 'cover' under nowPlayingLayout; upstream now reads
+    // that key as JSON. Upstream never writes those bare words, so seeing one
+    // means it's ours to move.
+    final legacy = await _get('nowPlayingLayout', '');
+    if (forkPlayerLayouts.contains(legacy)) {
+      await _set('forkPlayerLayout', legacy);
+      await _set('nowPlayingLayout', '');
+    }
+    return _get('forkPlayerLayout', 'dial');
+  }
+  static Future<void> setForkPlayerLayout(String value) =>
+      _set('forkPlayerLayout', value, notify: true);
 
   /// Days of history the Inbox filter covers. 0 means no limit.
   /// Defaults to 21 to match a server that prunes episodes at three weeks:
